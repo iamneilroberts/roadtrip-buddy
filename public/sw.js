@@ -1,6 +1,7 @@
 // Service Worker for Roadtrip Buddy PWA
 
-const CACHE_NAME = 'roadtrip-buddy-v1';
+// Increment cache version to force refresh
+const CACHE_NAME = 'roadtrip-buddy-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -11,22 +12,33 @@ const ASSETS_TO_CACHE = [
 
 // Install event - cache assets
 self.addEventListener('install', (event) => {
+  // Force activation without waiting
+  self.skipWaiting();
+  
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Cache opened');
-        return cache.addAll(ASSETS_TO_CACHE);
-      })
-      .then(() => {
-        return self.skipWaiting();
-      })
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        // Delete all caches to ensure fresh content
+        cacheNames.map((cacheName) => {
+          console.log('Deleting cache:', cacheName);
+          return caches.delete(cacheName);
+        })
+      );
+    }).then(() => {
+      return caches.open(CACHE_NAME)
+        .then((cache) => {
+          console.log('Cache opened');
+          return cache.addAll(ASSETS_TO_CACHE);
+        });
+    })
   );
 });
 
-// Activate event - clean up old caches
+// Activate event - clean up old caches and take control immediately
 self.addEventListener('activate', (event) => {
   const cacheWhitelist = [CACHE_NAME];
   
+  // Take control of all clients immediately
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
@@ -44,7 +56,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch event - serve from cache or network
+// Fetch event - network first strategy for HTML requests
 self.addEventListener('fetch', (event) => {
   // Skip cross-origin requests
   if (!event.request.url.startsWith(self.location.origin)) {
@@ -56,6 +68,27 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // For HTML requests, use network-first strategy
+  if (event.request.headers.get('accept').includes('text/html')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          // Cache the latest version
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+          return response;
+        })
+        .catch(() => {
+          // Fall back to cache if network fails
+          return caches.match(event.request);
+        })
+    );
+    return;
+  }
+
+  // For other requests, try cache first, then network
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
@@ -87,7 +120,7 @@ self.addEventListener('fetch', (event) => {
         });
       })
       .catch(() => {
-        // Fallback for offline HTML pages
+        // Fallback for offline
         if (event.request.headers.get('accept').includes('text/html')) {
           return caches.match('/');
         }
