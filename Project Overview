@@ -1,0 +1,119 @@
+Cline Architect Mode Prompt for Road Trip Assistant PWA
+Project Overview
+Create a proof-of-concept Progressive Web App (PWA) for a road trip assistant that provides personalized recommendations based on the user's location and route. The app should have a text chat interface with AI-powered responses, displaying recommendations in markdown format with supplementary JSON data.
+Core Requirements
+
+TypeScript-based React PWA
+Text chat interface (voice features will be added later)
+OpenAI GPT-4o integration
+Browser geolocation API usage
+Display of AI-generated markdown with structured JSON data
+Location simulation for testing
+
+Technical Specifications
+Frontend Framework
+
+Use React 18.x with TypeScript for consistency from the start
+Set up as a PWA with service workers for offline capabilities
+Use Vite as the build tool for better performance and simpler configuration
+
+Dependencies
+
+React 18.2.0
+TypeScript 5.0.x
+React Router 6.x for navigation
+react-markdown 8.x for rendering markdown content
+Tailwind CSS 3.x for styling
+Axios 1.x for API requests
+@tanstack/react-query 4.x for data fetching and caching
+date-fns 2.x for date manipulation
+
+State Management
+
+Use React Context for app-wide state
+Consider Zustand 4.x as a lightweight state management solution if needed
+
+API Integration
+
+Implement OpenAI API integration with proper error handling
+Use environment variables for API keys
+
+Geolocation
+
+Browser Geolocation API with appropriate permission handling
+Create a simulation mode for testing with predefined routes
+
+Development Approach
+
+Focus on completing core functionality before adding enhancements
+Create a minimal viable version of each feature first
+Use component-based architecture for reusability
+Prioritize user experience and performance
+
+Project Structure
+src/
+├── api/
+│   ├── openai.ts
+│   └── geolocation.ts
+├── components/
+│   ├── Chat/
+│   ├── Map/
+│   └── Recommendations/
+├── context/
+│   ├── LocationContext.tsx
+│   └── ChatContext.tsx
+├── hooks/
+│   ├── useLocation.ts
+│   └── useChat.ts
+├── pages/
+│   ├── HomePage.tsx
+│   └── ChatPage.tsx
+├── types/
+│   └── index.ts
+├── utils/
+│   ├── locationUtils.ts
+│   └── markdownUtils.ts
+├── App.tsx
+└── main.tsx
+
+Testing Strategy
+
+Create a LocationSimulator component that allows:
+
+Selection of predefined routes
+Manual position input
+Simulated movement along routes with time controls
+Saving/loading custom routes
+
+
+
+Deliverables for Initial Phase
+
+Working chat interface with OpenAI integration
+Location tracking and simulation for testing
+Basic recommendation display with markdown rendering
+Simple context preservation between sessions
+
+Future Considerations (not to implement in initial phase)
+
+Voice interface
+Offline capabilities
+User accounts and preferences
+Advanced route planning
+
+Implementation Path
+
+Set up the project with the required dependencies
+Implement the location tracking and simulation
+Create the chat interface
+Integrate with OpenAI API
+Implement markdown rendering for recommendations
+Add context preservation
+
+Key Takeaways
+
+Start with TypeScript from the beginning for type safety
+Use stable, well-maintained dependency versions
+Focus on core functionality before adding enhancements
+Implement location simulation for effective testing
+Maintain a simple, focused approach to reach a functional proof of concept quickly
